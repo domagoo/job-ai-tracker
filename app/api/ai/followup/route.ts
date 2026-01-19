@@ -6,7 +6,10 @@ export async function POST(req: Request) {
     const { applicationId, save } = await req.json();
 
     if (!applicationId) {
-      return NextResponse.json({ error: "Missing applicationId" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing applicationId" },
+        { status: 400 }
+      );
     }
 
     const app = await prisma.application.findUnique({
@@ -14,12 +17,18 @@ export async function POST(req: Request) {
     });
 
     if (!app) {
-      return NextResponse.json({ error: "Application not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Application not found" },
+        { status: 404 }
+      );
     }
 
     const key = process.env.OPENAI_API_KEY;
     if (!key) {
-      return NextResponse.json({ error: "Missing OPENAI_API_KEY" }, { status: 500 });
+      return NextResponse.json(
+        { error: "Missing OPENAI_API_KEY" },
+        { status: 500 }
+      );
     }
 
     const prompt = `
@@ -51,18 +60,46 @@ Status: ${app.status}
       }),
     });
 
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error("OpenAI error:", errText);
+      return NextResponse.json(
+        { error: "OpenAI request failed", detail: errText },
+        { status: 500 }
+      );
+    }
+
     const json = await res.json();
 
-    const text =
-      json?.output?.[0]?.content?.find((c: any) => c.type === "output_text")?.text ??
+    // Robust extraction for Responses API
+    const text: string =
+      json?.output_text ??
+      json?.output
+        ?.flatMap((o: any) => o?.content ?? [])
+        ?.filter(
+          (c: any) => c?.type === "output_text" && typeof c.text === "string"
+        )
+        ?.map((c: any) => c.text)
+        ?.join("\n") ??
       "";
 
-    if (!text) {
-      return NextResponse.json({ error: "No output generated" }, { status: 500 });
+    if (!text.trim()) {
+      console.error("OPENAI RESPONSE HAD NO TEXT:", json);
+      return NextResponse.json(
+        { error: "No output generated" },
+        { status: 500 }
+      );
     }
 
     // Simple parsing
-    const [subjectLine, ...bodyLines] = text.split("\n").filter(Boolean);
+    const lines = text
+      .split("\n")
+      .map((l: string) => l.trim())
+      .filter((l: string) => l.length > 0);
+
+    const subjectLine = lines[0] ?? "";
+    const bodyLines = lines.slice(1);
+
     const subject = subjectLine.replace(/^Subject:\s*/i, "");
     const body = bodyLines.join("\n").trim();
 
@@ -79,11 +116,16 @@ Status: ${app.status}
     return NextResponse.json({
       subject,
       body,
-      saved: !!save,
+      saved: Boolean(save),
     });
-  } catch (e: any) {
+  } catch (e: unknown) {
+    const message =
+      e instanceof Error ? e.message : "Unknown server error";
+
+    console.error("FOLLOWUP ROUTE ERROR:", message);
+
     return NextResponse.json(
-      { error: "Server error", detail: e.message },
+      { error: "Server error", detail: message },
       { status: 500 }
     );
   }
