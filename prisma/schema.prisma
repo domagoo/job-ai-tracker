@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Application {
+  id       Int               @id @default(autoincrement())
+  company  String
+  role     String
+  status   ApplicationStatus @default(APPLIED)
+  location String?
+  jobUrl   String?
+
+  // Kanban ordering
+  order Int @default(0)
+
+  /**
+   * -------- AI FEATURES --------
+   */
+
+  // AI recruiter-style summary
+  aiSummary String?
+
+  // Follow-up email generator
+  followUpEmailSubject String?
+  followUpEmailBody    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Event history
+  events ApplicationEvent[]
+
+  @@index([status, order])
+}
+
+model ApplicationEvent {
+  id            Int                  @id @default(autoincrement())
+  applicationId Int
+  type          ApplicationEventType
+  fromStatus    ApplicationStatus?
+  toStatus      ApplicationStatus?
+  createdAt     DateTime             @default(now())
+
+  // ✅ MUST be on one line
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId, createdAt])
+  @@index([type, createdAt])
+}
+
+model CoachReport {
+  id                 Int      @id @default(autoincrement())
+  rangeDays          Int
+  totalApplications  Int
+  byStatus           Json
+  dailyCreated       Json
+  funnel             Json
+  avgDaysInPipeline  Float
+  avgTimePerStage    Json
+  reachedCount       Int
+
+  title      String
+  summary    String
+  priorities Json
+
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+enum ApplicationStatus {
+  APPLIED
+  INTERVIEW
+  OFFER
+  REJECTED
+}
+
+enum ApplicationEventType {
+  CREATED
+  STATUS_CHANGE
+  REORDERED
+}

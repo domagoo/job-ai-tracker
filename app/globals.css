@@ -1,0 +1,479 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===== Base ===== */
+:root {
+  --text: rgba(255, 255, 255, 0.92);
+  --muted: rgba(255, 255, 255, 0.68);
+
+  /* ✅ Theme hues (edit once, affects mirror + skeleton) */
+  --blue: 120, 155, 255;
+  --purple: 160, 110, 255;
+  --teal: 120, 255, 225;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  color: var(--text);
+  background: #0b0b0f;
+}
+
+/* ===== Custom theme classes used by your page.tsx ===== */
+@layer components {
+  /* App background */
+  .bg-app {
+    background: radial-gradient(
+        900px 600px at 50% 15%,
+        rgba(var(--blue), 0.18),
+        rgba(0, 0, 0, 0) 60%
+      ),
+      radial-gradient(
+        800px 520px at 20% 80%,
+        rgba(var(--purple), 0.16),
+        rgba(0, 0, 0, 0) 60%
+      ),
+      radial-gradient(
+        700px 520px at 85% 85%,
+        rgba(var(--teal), 0.1),
+        rgba(0, 0, 0, 0) 60%
+      ),
+      linear-gradient(180deg, rgba(10, 10, 18, 1), rgba(0, 0, 0, 1));
+  }
+
+  /* Dark overlay for readability */
+  .bg-overlay {
+    background: radial-gradient(
+        900px 600px at 50% 15%,
+        rgba(0, 0, 0, 0.1),
+        rgba(0, 0, 0, 0.65)
+      ),
+      linear-gradient(180deg, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.8));
+  }
+
+  /* Hero glow blob */
+  .hero-glow {
+    position: absolute;
+    inset: -30%;
+    background: radial-gradient(circle at 30% 30%, rgba(var(--blue), 0.32), transparent 55%),
+      radial-gradient(circle at 80% 30%, rgba(var(--purple), 0.22), transparent 55%),
+      radial-gradient(circle at 50% 90%, rgba(var(--teal), 0.14), transparent 55%);
+    filter: blur(22px);
+    opacity: 0.85;
+    pointer-events: none;
+    animation: floatGlow 10s ease-in-out infinite alternate;
+  }
+
+  @keyframes floatGlow {
+    0% {
+      transform: translate3d(-1%, -1%, 0) scale(1.02);
+    }
+    100% {
+      transform: translate3d(1%, 1%, 0) scale(1.06);
+    }
+  }
+
+  /* Glass button */
+  .btn-glass {
+    @apply inline-flex items-center justify-center rounded-full
+      border border-white/20 bg-white/10 px-5 py-2.5
+      text-white/90 backdrop-blur-xl transition;
+    box-shadow: 0 18px 55px rgba(0, 0, 0, 0.35), 0 0 0 10px rgba(var(--blue), 0.1);
+  }
+
+  .btn-glass:hover {
+    @apply border-white/30 bg-white/15 -translate-y-[1px];
+    box-shadow: 0 22px 70px rgba(0, 0, 0, 0.45), 0 0 0 12px rgba(var(--blue), 0.14);
+  }
+
+  .btn-ghost {
+    @apply bg-white/5;
+    box-shadow: 0 18px 55px rgba(0, 0, 0, 0.25);
+  }
+
+  /* Pills */
+  .pill {
+    @apply rounded-full border border-white/15 bg-white/5 px-3 py-1
+      text-white/70 backdrop-blur-xl;
+  }
+
+  /* Glass card */
+  .glass-card {
+    @apply relative overflow-hidden rounded-2xl border border-white/15
+      bg-white/10 p-6 backdrop-blur-xl;
+    box-shadow: 0 30px 120px rgba(0, 0, 0, 0.55);
+  }
+
+  .glass-card__glow {
+    content: "";
+    position: absolute;
+    inset: -40%;
+    background: radial-gradient(circle at 25% 20%, rgba(var(--blue), 0.22), transparent 55%),
+      radial-gradient(circle at 80% 30%, rgba(var(--purple), 0.16), transparent 55%),
+      radial-gradient(circle at 50% 90%, rgba(var(--teal), 0.1), transparent 55%);
+    filter: blur(18px);
+    opacity: 0.75;
+    pointer-events: none;
+  }
+
+  .glass-card__glow.alt {
+    opacity: 0.6;
+    background: radial-gradient(circle at 15% 25%, rgba(var(--teal), 0.14), transparent 55%),
+      radial-gradient(circle at 85% 35%, rgba(var(--blue), 0.18), transparent 55%);
+  }
+
+  /* Feature blocks */
+  .feature {
+    @apply rounded-xl border border-white/10 bg-white/5 p-4;
+  }
+
+  .featureTitle {
+    @apply font-extrabold text-white/90;
+  }
+
+  .featureText {
+    @apply mt-1 text-sm text-white/70 leading-relaxed;
+  }
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-top-color: rgba(255, 255, 255, 0.9);
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===== Animations ===== */
+.animate-scale-in {
+  animation: scaleIn 0.18s ease-out forwards;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* =========================
+   Mirror Glass (Kanban)
+   ========================= */
+
+.mirror-glass {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  background: linear-gradient(
+    120deg,
+    rgba(var(--blue), 0.16),
+    rgba(var(--purple), 0.08) 45%,
+    rgba(var(--teal), 0.06)
+  );
+
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+
+  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.mirror-glass::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  pointer-events: none;
+  opacity: 0.75;
+
+  background: radial-gradient(1200px 180px at -10% 15%, rgba(var(--blue), 0.22), transparent 60%),
+    radial-gradient(900px 160px at 110% 20%, rgba(var(--purple), 0.18), transparent 55%),
+    radial-gradient(900px 180px at 60% 120%, rgba(var(--teal), 0.12), transparent 60%),
+    linear-gradient(
+      115deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.1) 18%,
+      rgba(255, 255, 255, 0.02) 35%,
+      transparent 60%
+    );
+
+  transform: translateX(-20%) rotate(2deg);
+  animation: mirrorSheen 5.2s ease-in-out infinite;
+}
+
+.mirror-glass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.35;
+
+  background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.06) 40%, transparent 70%);
+
+  transform: translateY(-30%);
+  animation: mirrorScan 6.5s ease-in-out infinite;
+}
+
+@keyframes mirrorSheen {
+  0% {
+    transform: translateX(-22%) rotate(2deg);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translateX(22%) rotate(-2deg);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateX(-22%) rotate(2deg);
+    opacity: 0.55;
+  }
+}
+
+@keyframes mirrorScan {
+  0% {
+    transform: translateY(-35%);
+  }
+  50% {
+    transform: translateY(25%);
+  }
+  100% {
+    transform: translateY(-35%);
+  }
+}
+
+/* =========================
+   Mirror Glass (Background)
+   ========================= */
+
+.mirror-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -9; /* behind content */
+
+  /* no border / no card shadow */
+  border: none;
+  box-shadow: none;
+
+  /* a wider, softer wash that reads across the whole page */
+  background:
+    radial-gradient(1100px 700px at 18% 20%, rgba(var(--blue), 0.12), transparent 60%),
+    radial-gradient(900px 650px at 85% 25%, rgba(var(--purple), 0.10), transparent 60%),
+    radial-gradient(900px 700px at 55% 95%, rgba(var(--teal), 0.08), transparent 62%),
+    linear-gradient(120deg, rgba(255,255,255,0.035), rgba(255,255,255,0.015) 40%, rgba(255,255,255,0.03));
+
+  backdrop-filter: blur(22px) saturate(160%);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+}
+
+/* softer, slower sheen for the whole background */
+.mirror-bg::before {
+  content: "";
+  position: absolute;
+  inset: -25%;
+  pointer-events: none;
+  opacity: 0.55;
+
+  background:
+    radial-gradient(1200px 260px at -10% 18%, rgba(var(--blue), 0.18), transparent 60%),
+    radial-gradient(1100px 240px at 110% 22%, rgba(var(--purple), 0.14), transparent 60%),
+    linear-gradient(
+      115deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.08) 18%,
+      rgba(255, 255, 255, 0.02) 38%,
+      transparent 62%
+    );
+
+  transform: translateX(-18%) rotate(1deg);
+  animation: mirrorBgSheen 9.5s ease-in-out infinite;
+}
+
+.mirror-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.18;
+
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 45%,
+    transparent 80%
+  );
+
+  transform: translateY(-35%);
+  animation: mirrorBgScan 12s ease-in-out infinite;
+}
+
+@keyframes mirrorBgSheen {
+  0%   { transform: translateX(-18%) rotate(1deg); opacity: 0.45; }
+  50%  { transform: translateX(18%) rotate(-1deg); opacity: 0.70; }
+  100% { transform: translateX(-18%) rotate(1deg); opacity: 0.45; }
+}
+
+@keyframes mirrorBgScan {
+  0%   { transform: translateY(-35%); }
+  50%  { transform: translateY(30%); }
+  100% { transform: translateY(-35%); }
+}
+
+
+/* ✅ Card version (what your KanbanCard uses) */
+.mirror-card {
+  position: relative;
+  overflow: hidden;
+
+  border: 1px solid rgba(var(--blue), 0.18);
+
+  background: linear-gradient(
+    135deg,
+    rgba(var(--blue), 0.14),
+    rgba(var(--purple), 0.06) 45%,
+    rgba(var(--teal), 0.06)
+  );
+
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+
+  box-shadow: 0 16px 55px rgba(0, 0, 0, 0.35), 0 0 0 10px rgba(var(--blue), 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* ✅ tighter blue “mirror sweep” (card-specific keyframes) */
+.mirror-card::before {
+  content: "";
+  position: absolute;
+  inset: -30% -10%;
+  pointer-events: none;
+  opacity: 0.55;
+
+  background: linear-gradient(
+    120deg,
+    transparent 0%,
+    rgba(var(--blue), 0.28) 25%,
+    rgba(255, 255, 255, 0.10) 40%,
+    rgba(var(--purple), 0.18) 55%,
+    transparent 75%
+  );
+
+  transform: translateX(-60%) rotate(10deg);
+  animation: cardSweep 4.8s ease-in-out infinite;
+}
+
+.mirror-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.18;
+
+  background: linear-gradient(180deg, transparent 0%, rgba(var(--teal), 0.12) 45%, transparent 80%);
+
+  transform: translateY(-30%);
+  animation: mirrorScan 7.4s ease-in-out infinite;
+}
+
+@keyframes cardSweep {
+  0% {
+    transform: translateX(-65%) rotate(10deg);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translateX(30%) rotate(10deg);
+    opacity: 0.65;
+  }
+  100% {
+    transform: translateX(-65%) rotate(10deg);
+    opacity: 0.35;
+  }
+}
+
+/* ===== Skeletons ===== */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.skeleton::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-60%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(var(--blue), 0.16) 30%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(var(--purple), 0.12) 70%,
+    transparent 100%
+  );
+  animation: skeletonShimmer 1.15s ease-in-out infinite;
+}
+
+@keyframes skeletonShimmer {
+  0% {
+    transform: translateX(-60%);
+  }
+  100% {
+    transform: translateX(60%);
+  }
+}
+
+
+/* Add to app/globals.css */
+
+/* Mirror-glass select */
+.select-glass {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+
+  color: rgba(255, 255, 255, 0.88);
+  padding: 12px 14px;
+
+  outline: none;
+  transition: border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+}
+
+.select-glass:focus {
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.10);
+}
+
+.select-glass:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Dropdown options (works in most browsers) */
+.select-glass option {
+  background: rgba(15, 15, 20, 0.98);
+  color: rgba(255, 255, 255, 0.92);
+}
+
+/* If you want a subtle built-in chevron, add padding-right and a background icon later */
