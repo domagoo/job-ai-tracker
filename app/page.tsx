@@ -27,11 +27,12 @@ export default function HomePage() {
             </a>
 
             <a
-              href="/"
+              href="https://portfolio-website-one-nu-97.vercel.app/"
               className="btn-glass btn-ghost"
             >
               Back to Portfolio
             </a>
+
           </div>
 
           <div className="mt-10 flex flex-wrap justify-center gap-2 text-xs text-white/60">

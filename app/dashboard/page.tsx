@@ -82,14 +82,12 @@ export default function DashboardPage() {
             </div>
 
             <div className="flex flex-wrap gap-3">
-              <a
-                className="btn-glass btn-ghost"
-                href={process.env.NEXT_PUBLIC_PORTFOLIO_URL || "https://michaelwilliams.dev"}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Back to Portfolio
-              </a>
+            <a
+              href="https://portfolio-website-one-nu-97.vercel.app/"
+              className="btn-glass btn-ghost"
+            >
+              Back to Portfolio
+            </a>
 
 
               <Link className="btn-glass" href="/kanban">
