@@ -45,13 +45,15 @@ export default function AISummaryPage() {
   const isDirty =
     !!selectedApp && (selectedApp.aiSummary ?? "") !== (summary ?? "");
 
-  /* ---------------- load saved summary on selection ---------------- */
+  /* ---------------- load saved summary on change ---------------- */
   useEffect(() => {
     setError(null);
+
     if (!selectedApp) {
       setSummary("");
       return;
     }
+
     setSummary(selectedApp.aiSummary ?? "");
   }, [selectedApp]);
 
@@ -140,7 +142,8 @@ export default function AISummaryPage() {
           <div>
             <h1 className="text-3xl font-bold">AI Summary</h1>
             <p className="mt-1 text-white/65">
-              Generate a recruiter-friendly summary per application (2–4 sentences).
+              Generate a recruiter-friendly summary per application (2–4
+              sentences).
             </p>
           </div>
 
@@ -160,13 +163,20 @@ export default function AISummaryPage() {
 
             <div className="mt-4 relative">
               <select
-                aria-label="Select application"
+                aria-label="Select job application"
                 className="
-                  w-full rounded-xl px-4 py-3
-                  bg-white/10 text-white backdrop-blur-xl
-                  border border-white/20 shadow-lg
-                  outline-none transition
+                  w-full
+                  rounded-xl
+                  px-4 py-3
+                  bg-white/10
+                  text-white
+                  backdrop-blur-xl
+                  border border-white/20
+                  shadow-lg
+                  outline-none
+                  transition
                   focus:ring-2 focus:ring-white/30
+                  focus:border-white/40
                   appearance-none
                 "
                 value={selectedId ?? ""}
@@ -175,6 +185,7 @@ export default function AISummaryPage() {
                 <option value="" disabled className="bg-[#0b0f1a] text-white/50">
                   Select…
                 </option>
+
                 {apps.map((a) => (
                   <option
                     key={a.id}
@@ -200,8 +211,9 @@ export default function AISummaryPage() {
             </button>
 
             {error && (
-              <div className="mt-3 feature mirror-card text-sm text-red-300">
-                {error}
+              <div className="mt-3 feature mirror-card">
+                <div className="text-sm font-semibold">Error</div>
+                <div className="mt-1 text-sm text-white/70">{error}</div>
               </div>
             )}
           </div>
@@ -210,12 +222,14 @@ export default function AISummaryPage() {
           <div className="glass-card mirror-glass">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-extrabold">Output</h2>
-              <span className="pill text-[11px]">
-                {!summary
+              <span className="pill !py-0.5 !px-2 text-[11px]">
+                {!selectedApp
+                  ? "—"
+                  : !summary
                   ? "Not generated"
                   : hasSaved && !isDirty
                   ? "Saved"
-                  : hasSaved
+                  : hasSaved && isDirty
                   ? "Edited"
                   : "Not saved"}
               </span>
@@ -225,18 +239,19 @@ export default function AISummaryPage() {
               You can edit the text before saving (optional).
             </p>
 
-            {/* ✅ FIXED OUTPUT AREA */}
-            <div className="mt-4 feature mirror-card">
+            <div className="mt-4 feature mirror-card min-h-[220px]">
               {summary ? (
                 <textarea
+                  aria-label="AI summary output"
                   value={summary}
                   onChange={(e) => setSummary(e.target.value)}
-                  aria-label="AI summary output"
                   className="
-                    w-full min-h-[220px]
-                    bg-transparent text-white
-                    resize-y outline-none
-                    text-sm leading-relaxed
+                    w-full h-full
+                    bg-transparent
+                    text-white
+                    resize-none
+                    outline-none
+                    text-sm
                   "
                 />
               ) : (
@@ -248,7 +263,7 @@ export default function AISummaryPage() {
 
             <button
               onClick={saveSummary}
-              disabled={!summary.trim() || saving}
+              disabled={!selectedId || !summary.trim() || saving}
               className="btn-glass mt-4 w-full disabled:opacity-50"
             >
               {saving ? "Saving…" : "Save Summary to Database"}
