@@ -1,4 +1,3 @@
-// app/ai-summary/page.tsx
 "use client";
 
 import Link from "next/link";
@@ -21,7 +20,6 @@ export default function AISummaryPage() {
 
   const [summary, setSummary] = useState("");
   const [loading, setLoading] = useState(false);
-
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,9 +42,10 @@ export default function AISummaryPage() {
   }, [apps, selectedId]);
 
   const hasSaved = !!selectedApp?.aiSummary;
-  const isDirty = !!selectedApp && (selectedApp.aiSummary ?? "") !== (summary ?? "");
+  const isDirty =
+    !!selectedApp && (selectedApp.aiSummary ?? "") !== (summary ?? "");
 
-  /* ---------------- when selection changes: load saved summary if present ---------------- */
+  /* ---------------- load saved summary on change ---------------- */
   useEffect(() => {
     setError(null);
 
@@ -55,7 +54,6 @@ export default function AISummaryPage() {
       return;
     }
 
-    // show saved summary if it exists
     setSummary(selectedApp.aiSummary ?? "");
   }, [selectedApp]);
 
@@ -93,7 +91,7 @@ export default function AISummaryPage() {
     }
   }
 
-  /* ---------------- save summary (PATCH /api/applications) ---------------- */
+  /* ---------------- save summary ---------------- */
   async function saveSummary() {
     if (!selectedId || !summary.trim()) return;
 
@@ -116,9 +114,10 @@ export default function AISummaryPage() {
         return;
       }
 
-      // Update local apps list so pill + selection persistence works
       setApps((prev) =>
-        prev.map((a) => (a.id === selectedId ? { ...a, aiSummary: summary.trim() } : a))
+        prev.map((a) =>
+          a.id === selectedId ? { ...a, aiSummary: summary.trim() } : a
+        )
       );
 
       toast.success("Summary saved to database ✅");
@@ -143,7 +142,8 @@ export default function AISummaryPage() {
           <div>
             <h1 className="text-3xl font-bold">AI Summary</h1>
             <p className="mt-1 text-white/65">
-              Generate a recruiter-friendly summary per application (2–4 sentences).
+              Generate a recruiter-friendly summary per application (2–4
+              sentences).
             </p>
           </div>
 
@@ -154,7 +154,7 @@ export default function AISummaryPage() {
 
         {/* Content */}
         <div className="mt-8 grid gap-6 lg:grid-cols-2">
-          {/* LEFT — SELECT */}
+          {/* LEFT */}
           <div className="glass-card mirror-glass">
             <h2 className="text-lg font-extrabold">Select application</h2>
             <p className="mt-1 text-sm text-white/60">
@@ -163,6 +163,7 @@ export default function AISummaryPage() {
 
             <div className="mt-4 relative">
               <select
+                aria-label="Select job application"
                 className="
                   w-full
                   rounded-xl
@@ -180,7 +181,6 @@ export default function AISummaryPage() {
                 "
                 value={selectedId ?? ""}
                 onChange={(e) => setSelectedId(asInt(e.target.value))}
-                aria-label="Select application"
               >
                 <option value="" disabled className="bg-[#0b0f1a] text-white/50">
                   Select…
@@ -190,14 +190,13 @@ export default function AISummaryPage() {
                   <option
                     key={a.id}
                     value={a.id}
-                    className="bg-[#0b0f1a] text-white hover:bg-white/10"
+                    className="bg-[#0b0f1a] text-white"
                   >
                     {a.company} — {a.role} ({a.status})
                   </option>
                 ))}
               </select>
 
-              {/* dropdown arrow */}
               <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-white/60">
                 ▾
               </span>
@@ -211,16 +210,15 @@ export default function AISummaryPage() {
               {loading ? "Generating…" : "Generate AI Summary"}
             </button>
 
-            {/* Feedback (optional inline, toast already shows too) */}
-            {error ? (
+            {error && (
               <div className="mt-3 feature mirror-card">
-                <div className="text-sm font-semibold text-white/85">Error</div>
+                <div className="text-sm font-semibold">Error</div>
                 <div className="mt-1 text-sm text-white/70">{error}</div>
               </div>
-            ) : null}
+            )}
           </div>
 
-          {/* RIGHT — OUTPUT */}
+          {/* RIGHT */}
           <div className="glass-card mirror-glass">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-extrabold">Output</h2>
@@ -241,9 +239,10 @@ export default function AISummaryPage() {
               You can edit the text before saving (optional).
             </p>
 
-            <div className="mt-4 feature mirror-card min-h-[180px]">
+            <div className="mt-4 feature mirror-card min-h-[220px]">
               {summary ? (
                 <textarea
+                  aria-label="AI summary output"
                   value={summary}
                   onChange={(e) => setSummary(e.target.value)}
                   className="
@@ -254,7 +253,6 @@ export default function AISummaryPage() {
                     outline-none
                     text-sm
                   "
-                  aria-label="AI summary output"
                 />
               ) : (
                 <div className="text-white/60">
